@@ -1,0 +1,11 @@
+<resources>
+
+    <string name="app_name">RestAPI</string>
+
+    <!-- Error Messages -->
+    <string name="message.error.unknown">This is embarrassing! An error occurred in the process</string>
+    <string name="message.error.network">Sorry, seems that you don\'t have an Internet connection right now</string>
+    <string name="message.error.timeout">Sorry, seems that the server is too busy. Try again later</string>
+    <string name="message.error.server">Sorry, the server responded with an error. Try again later</string>
+
+</resources>
