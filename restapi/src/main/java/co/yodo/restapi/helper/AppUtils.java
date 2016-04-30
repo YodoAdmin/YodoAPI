@@ -9,6 +9,24 @@ import android.util.Log;
  */
 public class AppUtils {
     /**
+     * A simple check to see if a string is a valid number before inserting
+     * into the shared preferences.
+     *
+     * @param s The number to be checked.
+     * @return true  It is a number.
+     *         false It is not a number.
+     */
+    public static Boolean isNumber(String s) {
+        try {
+            Integer.parseInt(s);
+        }
+        catch( NumberFormatException e ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Logger for the application, depending on the flag DEBUG
      * @param type The char type of the log
      * @param TAG The String used to know to which class the log belongs

@@ -7,5 +7,6 @@
     <string name="message.error.network">Sorry, seems that you don\'t have an Internet connection right now</string>
     <string name="message.error.timeout">Sorry, seems that the server is too busy. Try again later</string>
     <string name="message.error.server">Sorry, the server responded with an error. Try again later</string>
+    <string name="message.error.transaction">Sorry, the type of transaction is not valid. Try again later</string>
 
 </resources>

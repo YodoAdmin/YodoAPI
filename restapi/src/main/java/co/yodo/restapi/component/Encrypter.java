@@ -40,12 +40,12 @@ public class Encrypter {
 	/**
 	 * Cipher instance used for encryption
 	 */
-	private static String CIPHER_INSTANCE = "RSA/ECB/PKCS1Padding";
+	private static final String CIPHER_INSTANCE = "RSA/ECB/PKCS1Padding";
 	
 	/**
 	 * Public key instance
 	 */
-	private static String KEY_INSTANCE = "RSA";
+	private static final String KEY_INSTANCE = "RSA";
 	
 	/**
 	 * Contains string to be encrypted
@@ -111,18 +111,18 @@ public class Encrypter {
 	 * @return String of hexadecimal number
 	 */
 	public String bytesToHex() {
-		StringBuffer hexCrypt = new StringBuffer();
-		for( int i = 0; i < this.cipherData.length; i++ ) {
-				int int_value = (int)this.cipherData[i];
-				
-				if(int_value < 0)
-					int_value = int_value + 256;
-				String hexNum = Integer.toHexString(int_value);
-				if(hexNum.length() == 1) {
-					hexCrypt.append("0"+ hexNum);
-				} else {
-					hexCrypt.append(hexNum);
-				}
+		StringBuilder hexCrypt = new StringBuilder();
+		for( byte aCipherData : this.cipherData ) {
+			int int_value = ( int ) aCipherData;
+
+			if( int_value < 0 )
+				int_value = int_value + 256;
+			String hexNum = Integer.toHexString( int_value );
+			if( hexNum.length() == 1 ) {
+				hexCrypt.append( "0" ).append( hexNum );
+			} else {
+				hexCrypt.append( hexNum );
+			}
 		}
 		return hexCrypt.toString();
 	}
