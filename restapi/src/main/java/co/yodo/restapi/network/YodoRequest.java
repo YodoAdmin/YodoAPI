@@ -48,7 +48,6 @@ public class YodoRequest {
 
     /** Two paths used for the requests */
     private static final String YODO_ADDRESS = "/yodo/yodoswitchrequest/getRequest/";
-    private static final String YODO         = "/yodo/";
 
     /** Timeout for the request */
     private final static int TIMEOUT = 1000 * 10; // 10 seconds
@@ -138,6 +137,9 @@ public class YodoRequest {
     }
 
     private void sendXMLRequest( final String pRequest, final int responseCode ) {
+        if( listener == null )
+            throw new NullPointerException( "Listener not defined" );
+
         final StringRequest httpRequest = new StringRequest( Request.Method.GET, IP + YODO_ADDRESS + pRequest,
                 new Response.Listener<String>() {
                     @Override
@@ -192,6 +194,12 @@ public class YodoRequest {
      * Queries directed to the server
      * {{ ======================================================================
      */
+
+    /**
+     * Authenticates the POS using the hardware token
+     * @param responseCode The code to respond to the listener
+     * @param hardwareToken The hardware token - POS identifier
+     */
     public void requestMerchAuth( int responseCode, String hardwareToken ) {
         String sEncryptedMerchData, pRequest;
 
@@ -202,13 +210,19 @@ public class YodoRequest {
 
         pRequest = ServerRequest.createAuthenticationRequest(
                 sEncryptedMerchData,
-                Integer.parseInt( ServerRequest.AUTH_MERCH_HW_SUBREQ )
+                ServerRequest.AUTH_MERCH_HW_ST
         );
 
         sendXMLRequest( pRequest, responseCode );
     }
 
-    public void requestPIPAuthentication( int responseCode, String hardwareToken, String pip ) {
+    /**
+     * Authenticates the POS using the hardware token and PIP
+     * @param responseCode The code to respond to the listener
+     * @param hardwareToken The hardware token - POS identifier
+     * @param pip The PIP (password) used to authenticate the merchant
+     */
+    public void requestMerchAuth( int responseCode, String hardwareToken, String pip ) {
         String sEncryptedClientData, pRequest;
 
         // Encrypting to create request
@@ -222,7 +236,188 @@ public class YodoRequest {
 
         pRequest = ServerRequest.createAuthenticationRequest(
                 sEncryptedClientData,
-                Integer.parseInt( ServerRequest.AUTH_MERCH_HW_PIP_SUBREQ )
+                ServerRequest.AUTH_MERCH_HW_PIP_ST
+        );
+
+        sendXMLRequest( pRequest, responseCode );
+    }
+
+    /**
+     * Request an exchange transaction (payment) to the server
+     * @param responseCode The code to respond to the listener
+     * @param hardwareToken The hardware token - POS identifier
+     * @param client The client data (encrypted)
+     * @param totalPurchase The total amount to pay
+     * @param cashTender The amount of money that is being paid with cash
+     * @param cashBack The cash back of the client
+     * @param latitude Position - latitude
+     * @param longitude Position - longitude
+     * @param currency The currency of the cash
+     */
+    public void requestExchange( int responseCode, String hardwareToken, String client,
+                                 String totalPurchase, String cashTender, String cashBack,
+                                 double latitude, double longitude, String currency ) {
+        String sEncryptedMerchData, sEncryptedExchangeUsrData, pRequest;
+        StringBuilder sEncryptedUsrData = new StringBuilder();
+        StringBuilder sExchangeUsrData = new StringBuilder();
+
+        /// Encrypting to create request
+        oEncrypter.setsUnEncryptedString( hardwareToken );
+        oEncrypter.rsaEncrypt( mCtx );
+        sEncryptedMerchData = oEncrypter.bytesToHex();
+
+        sEncryptedUsrData.append( sEncryptedMerchData ).append( REQ_SEP );
+        sEncryptedUsrData.append( client ).append( REQ_SEP );
+
+        sExchangeUsrData.append( latitude ).append( REQ_SEP );
+        sExchangeUsrData.append( longitude ).append(REQ_SEP);
+        sExchangeUsrData.append( totalPurchase ).append(REQ_SEP);
+        sExchangeUsrData.append( cashTender ).append( REQ_SEP );
+        sExchangeUsrData.append( cashBack ).append(REQ_SEP);
+        sExchangeUsrData.append( currency );
+
+        oEncrypter.setsUnEncryptedString( sExchangeUsrData.toString() );
+        oEncrypter.rsaEncrypt( mCtx );
+        sEncryptedExchangeUsrData = oEncrypter.bytesToHex();
+        sEncryptedUsrData.append( sEncryptedExchangeUsrData );
+
+        pRequest = ServerRequest.createExchangeRequest(
+                sEncryptedUsrData.toString(),
+                ServerRequest.EXCH_MERCH_ST
+        );
+
+        sendXMLRequest( pRequest, responseCode );
+    }
+
+    /**
+     * Request something from the server with password authentication
+     * @param responseCode The code to respond to the listener
+     * @param hardwareToken The hardware token - POS identifier
+     * @param pip The PIP (password) used to authenticate the merchant
+     * @param record The identifier of the resource that we want to get from the server
+     */
+    public void requestQuery( int responseCode, String hardwareToken, String pip, ServerRequest.QueryRecord record ) {
+        String sEncryptedMerchData, pRequest;
+
+        // Encrypting to create request
+        oEncrypter.setsUnEncryptedString(
+                    hardwareToken + REQ_SEP +
+                    pip + REQ_SEP +
+                    record.getValue()
+        );
+        oEncrypter.rsaEncrypt( mCtx );
+        sEncryptedMerchData = oEncrypter.bytesToHex();
+
+        pRequest = ServerRequest.createQueryRequest(
+                sEncryptedMerchData,
+                ServerRequest.QUERY_ACC_ST
+        );
+
+        sendXMLRequest( pRequest, responseCode );
+    }
+
+    /**
+     * Request something from the server
+     * @param responseCode The code to respond to the listener
+     * @param hardwareToken The hardware token - POS identifier
+     * @param record The identifier of the resource that we want to get from the server
+     */
+    public void requestQuery( int responseCode, String hardwareToken, ServerRequest.QueryRecord record ) {
+        String sEncryptedMerchData, pRequest;
+
+        // Encrypting to create request
+        oEncrypter.setsUnEncryptedString(
+                        hardwareToken + REQ_SEP +
+                        record.getValue()
+        );
+        oEncrypter.rsaEncrypt( mCtx );
+        sEncryptedMerchData = oEncrypter.bytesToHex();
+
+        pRequest = ServerRequest.createQueryRequest(
+                sEncryptedMerchData,
+                ServerRequest.QUERY_ACC_ST
+        );
+
+        sendXMLRequest( pRequest, responseCode );
+    }
+
+    /**
+     * Request an alternate transaction (payment) to the server
+     * @param responseCode The code to respond to the listener
+     * @param transType The type of transaction (e.g. heart, visa, paypal, transit)
+     * @param hardwareToken The hardware token - POS identifier
+     * @param client The client data (encrypted)
+     * @param totalPurchase The total amount to pay
+     * @param cashTender The amount of money that is being paid with cash
+     * @param cashBack The cash back of the client
+     * @param latitude Position - latitude
+     * @param longitude Position - longitude
+     * @param currency The currency of the cash
+     */
+    public void requestAlternate( int responseCode, String transType, String hardwareToken, String client,
+                                 String totalPurchase, String cashTender, String cashBack,
+                                 double latitude, double longitude, String currency ) {
+        String sEncryptedMerchData, sEncryptedExchangeUsrData, pRequest;
+        StringBuilder sEncryptedUsrData = new StringBuilder();
+        StringBuilder sExchangeUsrData = new StringBuilder();
+
+        if( !AppUtils.isNumber( transType ) ) {
+            ServerResponse response = new ServerResponse();
+            response.setCode( ServerResponse.ERROR_FAILED );
+            response.setMessage( mCtx.getString( R.string.message_error_transaction ) );
+            listener.onResponse( responseCode, response );
+            return;
+        }
+
+        /// Encrypting to create request
+        oEncrypter.setsUnEncryptedString( hardwareToken );
+        oEncrypter.rsaEncrypt( mCtx );
+        sEncryptedMerchData = oEncrypter.bytesToHex();
+
+        sEncryptedUsrData.append( sEncryptedMerchData ).append( REQ_SEP );
+        sEncryptedUsrData.append( client ).append( REQ_SEP );
+
+        sExchangeUsrData.append( latitude ).append( REQ_SEP );
+        sExchangeUsrData.append( longitude ).append(REQ_SEP);
+        sExchangeUsrData.append( totalPurchase ).append(REQ_SEP);
+        sExchangeUsrData.append( cashTender ).append( REQ_SEP );
+        sExchangeUsrData.append( cashBack ).append(REQ_SEP);
+        sExchangeUsrData.append( currency );
+
+        oEncrypter.setsUnEncryptedString( sExchangeUsrData.toString() );
+        oEncrypter.rsaEncrypt( mCtx );
+        sEncryptedExchangeUsrData = oEncrypter.bytesToHex();
+        sEncryptedUsrData.append( sEncryptedExchangeUsrData );
+
+        pRequest = ServerRequest.createAlternateRequest(
+                sEncryptedUsrData.toString(),
+                transType
+        );
+
+        sendXMLRequest( pRequest, responseCode );
+    }
+
+    /**
+     * Register a POS to a merchant
+     * @param responseCode The code to respond to the listener
+     * @param hardwareToken The hardware token - POS identifier
+     * @param token Token generated in the server to register a POS
+     */
+    public void requestMerchReg( int responseCode, String hardwareToken, String token ) {
+        String sEncryptedMerchData, pRequest;
+
+        // Encrypting to create request
+        oEncrypter.setsUnEncryptedString(
+                    hardwareToken + REQ_SEP +
+                    token + REQ_SEP +
+                    System.currentTimeMillis() / 1000L
+        );
+        oEncrypter.rsaEncrypt( mCtx );
+        sEncryptedMerchData = oEncrypter.bytesToHex();
+
+        pRequest = ServerRequest.createRegistrationRequest(
+                sEncryptedMerchData,
+                ServerRequest.REG_MERCH_ST
         );
 
         sendXMLRequest( pRequest, responseCode );
