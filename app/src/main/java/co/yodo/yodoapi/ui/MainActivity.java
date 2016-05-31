@@ -35,14 +35,14 @@ public class MainActivity extends AppCompatActivity implements YodoRequest.RESTL
 
         new Handler().postDelayed( stop , 5000 );*/
 
-        YodoRequest.getInstance( MainActivity.this ).setListener( this );
+        /*YodoRequest.getInstance( MainActivity.this ).setListener( this );
         YodoRequest.getInstance( MainActivity.this ).requestMerchAuth( 1, "asd" );
         YodoRequest.getInstance( MainActivity.this ).requestMerchAuth( 1, "354984054060899" );
         YodoRequest.getInstance( MainActivity.this ).requestQuery(
                 1,
                 "354984054060899",
                 "test",
-                ServerRequest.QueryRecord.HISTORY_BALANCE );
+                ServerRequest.QueryRecord.HISTORY_BALANCE );*/
     }
 
     private Runnable stop = new Runnable() {

@@ -27,6 +27,21 @@ public class ServerResponse {
     public static final String ERROR_INCORRECT_PIP = "ER22";
     public static final String ERROR_INSUFF_FUNDS  = "ER25";
 
+    /** Param elements */
+    public static final String LOGO         = "logo_url";
+    public static final String DEBIT        = "MerchantDebitWTCost";
+    public static final String CREDIT       = "MerchantCreditWTCost";
+    public static final String CURRENCY     = "DefaultCurrency";
+    public static final String SETTLEMENT   = "Settlement";
+    public static final String EQUIPMENT    = "Equipments";
+    public static final String LEASE        = "Lease";
+    public static final String TOTAL_LEASE  = "TotalLease";
+    public static final String ACCOUNT      = "account";
+    public static final String PURCHASE     = "purchase_price";
+    public static final String AMOUNT_DELTA = "amount_delta";
+    public static final String MERCH_RATE   = "merch_rate";
+    public static final String TENDER_RATE  = "tender_rate";
+
     private String code;
     private String authNumber;
     private String message;

@@ -11,14 +11,23 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,8 +36,10 @@ import javax.xml.parsers.SAXParserFactory;
 
 import co.yodo.restapi.R;
 import co.yodo.restapi.component.Encrypter;
+import co.yodo.restapi.component.MemoryBMCache;
 import co.yodo.restapi.helper.AppUtils;
 import co.yodo.restapi.network.builder.ServerRequest;
+import co.yodo.restapi.network.handler.JSONHandler;
 import co.yodo.restapi.network.handler.XMLHandler;
 import co.yodo.restapi.network.model.ServerResponse;
 
@@ -47,9 +58,10 @@ public class YodoRequest {
     private static final String IP      = DEV_IP;
 
     /** Two paths used for the requests */
+    private static final String YODO         = "/yodo/";
     private static final String YODO_ADDRESS = "/yodo/yodoswitchrequest/getRequest/";
 
-    /** Timeout for the request */
+    /** Timeout for the requests */
     private final static int TIMEOUT = 1000 * 10; // 10 seconds
 
     private RetryPolicy retryPolicy = new DefaultRetryPolicy(
@@ -61,8 +73,9 @@ public class YodoRequest {
     /** Object used to encrypt information */
     private final Encrypter oEncrypter;
 
-    /** Global request queue for Volley */
+    /** Global request queue for Volley and Image Loader */
     private RequestQueue mRequestQueue = null;
+    private ImageLoader mImageLoader = null;
 
     /** Singleton instance */
     private static YodoRequest mInstance = null;
@@ -94,6 +107,7 @@ public class YodoRequest {
         mCtx = context.getApplicationContext();
         mRequestQueue = getRequestQueue();
         oEncrypter = new Encrypter();
+        mImageLoader = new ImageLoader( mRequestQueue, new MemoryBMCache( context ) );
     }
 
     /**
@@ -120,11 +134,27 @@ public class YodoRequest {
     }
 
     /**
+     * Gets the image loader object
+     * @return The image loader
+     */
+    public ImageLoader getImageLoader() {
+        return mImageLoader;
+    }
+
+    /**
      * Add a listener to the service
      * @param listener Listener for the requests to the server
      */
     public void setListener( RESTListener listener ) {
         this.listener = listener ;
+    }
+
+    /**
+     * Returns the current IP address (dev or prod)
+     * @return An string with the IP address
+     */
+    public static String getRoot() {
+        return IP;
     }
 
     /**
@@ -136,6 +166,11 @@ public class YodoRequest {
         return ( IP.equals( PROD_IP ) ) ? "P" : "D";
     }
 
+    /**
+     * Makes a requests to the server which returns an XML
+     * @param pRequest The request path
+     * @param responseCode The response code
+     */
     private void sendXMLRequest( final String pRequest, final int responseCode ) {
         if( listener == null )
             throw new NullPointerException( "Listener not defined" );
@@ -160,6 +195,68 @@ public class YodoRequest {
                         } catch( ParserConfigurationException | SAXException | IOException e ) {
                             e.printStackTrace();
                         }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse( VolleyError error ) {
+                        error.printStackTrace();
+                        // depending on the error, return an alert to the activity
+                        ServerResponse response = new ServerResponse();
+                        if( error instanceof TimeoutError  ) {
+                            response.setCode( ServerResponse.ERROR_TIMEOUT );
+                            response.setMessage( mCtx.getString( R.string.message_error_timeout ) );
+                        } else if( error instanceof NetworkError ) {
+                            response.setCode( ServerResponse.ERROR_NETWORK );
+                            response.setMessage( mCtx.getString( R.string.message_error_network ) );
+                        } else if( error instanceof ServerError ) {
+                            response.setCode( ServerResponse.ERROR_SERVER );
+                            response.setMessage( mCtx.getString( R.string.message_error_server ) );
+                        } else {
+                            response.setCode( ServerResponse.ERROR_UNKOWN );
+                            response.setMessage( mCtx.getString( R.string.message_error_unknown ) );
+                        }
+                        listener.onResponse( responseCode, response );
+                    }
+                }
+        );
+        httpRequest.setTag( "GET" );
+        httpRequest.setRetryPolicy( retryPolicy );
+        getRequestQueue().add( httpRequest );
+    }
+
+    /**
+     * Makes an JSON request to the server for the currencies
+     * @param pRequest The route
+     * @param merchantCurr The merchant currency
+     * @param tenderCurr The tender amount currency
+     * @param responseCode The response code
+     */
+    @SuppressWarnings( "ResultOfMethodCallIgnored" )
+    private void sendArrayRequest( final String pRequest, final String merchantCurr, final String tenderCurr, final int responseCode ) {
+        final JsonArrayRequest httpRequest = new JsonArrayRequest( Request.Method.GET, IP + YODO + pRequest, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse( JSONArray json ) {
+                        //Find the dir to save cached files
+                        File cacheDir = mCtx.getCacheDir();
+                        File file = new File( cacheDir, "currencies.json" );
+
+                        try {
+                            FileWriter writer = new FileWriter( file.getAbsolutePath() );
+                            writer.write( json.toString() );
+                            writer.flush();
+                            writer.close();
+                        } catch( IOException e ) {
+                            e.printStackTrace();
+                            if( file.exists() )
+                                file.delete();
+                        }
+
+                        JSONHandler handler = new JSONHandler( merchantCurr, tenderCurr );
+                        ServerResponse response = handler.parseCurrencies( json );
+                        AppUtils.Logger( 'i', TAG, response.toString() );
+                        listener.onResponse( responseCode, response );
                     }
                 },
                 new Response.ErrorListener() {
@@ -421,5 +518,53 @@ public class YodoRequest {
         );
 
         sendXMLRequest( pRequest, responseCode );
+    }
+
+    /**
+     * Get the currencies (json) from the server and parses them
+     * to only return the required two currencies (merchant and tender)
+     * @param responseCode The code to respond to the listener
+     * @param merchantCurr The merchant currency
+     * @param tenderCurr The tender amount currency
+     */
+    @SuppressWarnings( "ResultOfMethodCallIgnored" )
+    public void requestCurrencies( int responseCode, String merchantCurr, String tenderCurr ) {
+        // Life time of the file
+        final int MAX_AGE = 6 * 60 * 60 * 1000; // 6 hours (1000 = 1 sec)
+
+        //Find the dir to save cached files
+        File cacheDir = mCtx.getCacheDir();
+        File file = new File( cacheDir, "currencies.json" );
+
+        boolean exists = file.exists();
+        if( !exists || file.lastModified() + MAX_AGE < System.currentTimeMillis() ) {
+            file.delete();
+            sendArrayRequest( "currency/index.json", merchantCurr, tenderCurr, responseCode );
+        } else {
+            try {
+                FileInputStream fin   = new FileInputStream( file );
+                BufferedReader reader = new BufferedReader( new InputStreamReader( fin ) );
+                StringBuilder sb      = new StringBuilder();
+                String line;
+
+                while( ( line = reader.readLine() ) != null )
+                    sb.append( line ).append( "\n" );
+
+                reader.close();
+                fin.close();
+                // Transform the text to JSONArray
+                JSONArray array = new JSONArray( sb.toString() );
+                if( array.length() <= 0 )
+                    file.delete();
+
+                // Send response
+                JSONHandler handler = new JSONHandler( merchantCurr, tenderCurr );
+                ServerResponse response = handler.parseCurrencies(  array );
+                AppUtils.Logger( 'i', TAG, response.toString() );
+                listener.onResponse( responseCode, response );
+            } catch ( IOException | JSONException e ) {
+                e.printStackTrace();
+            }
+        }
     }
 }

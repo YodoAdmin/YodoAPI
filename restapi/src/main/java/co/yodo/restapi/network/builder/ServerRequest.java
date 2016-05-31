@@ -16,8 +16,6 @@ public class ServerRequest {
 
     /** Parameters used for creating an authenticate request */
     private static final String AUTH_RT              = "0";
-    public static final String AUTH_CLIENT_HW_ST     = "1";
-    public static final String AUTH_CLIENT_HW_PIP_ST = "2";
     public static final String AUTH_MERCH_HW_ST      = "4";
     public static final String AUTH_MERCH_HW_PIP_ST  = "5";
 
@@ -27,10 +25,9 @@ public class ServerRequest {
 
     /** Parameters used for creating a balance request */
     private static final String QUERY_RT       = "4";
-    public static final String QUERY_BAL_TP_ST = "2";
     public static final String QUERY_ACC_ST    = "3";
 
-    /** Query Records - QUERY_ACC_SUBREQ */
+    /** Query Records - QUERY_ACC_ST */
     public enum QueryRecord {
         HISTORY_BALANCE   ( 10 ),
         TODAY_BALANCE     ( 12 ),
@@ -130,6 +127,11 @@ public class ServerRequest {
      * Creates an alternate switch request
      * @param pUsrData	Encrypted user's data
      * @param iAlterST Sub-type of the request
+     *                 VISA_CRED_ST   - 1
+     *                 HEART_ST       - 3
+     *                 VISA_PREP_ST   - 4
+     *                 PAYPAL_ST      - 5
+     *                 PUB_TRANSIT_ST - 6
      * @return	String	Request for getting the Alternate Transaction
      */
     public static String createAlternateRequest( String pUsrData, String iAlterST ) {
