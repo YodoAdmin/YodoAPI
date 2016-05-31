@@ -6,6 +6,9 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import co.yodo.restapi.network.model.ServerResponse;
 
+// Import all the tags for the xml
+import static co.yodo.restapi.network.model.ServerResponse.*;
+
 /**
  * Created by hei on 26/04/16.
  * Handler for the XML responses
@@ -18,23 +21,8 @@ public class XMLHandler extends DefaultHandler {
     private static final String CODE    = "code";
     private static final String AUTHNUM = "authNumber";
     private static final String MESSAGE = "message";
+    public static final String PARAMS   = "params";
     private static final String TIME    = "rtime";
-
-    //////////////////////////// MERCHANT /////////////////////////////////
-    /** Param elements */
-    public static final String PARAMS       = "params";
-    public static final String LOGO         = "logo_url";
-    public static final String DEBIT        = "MerchantDebitWTCost";
-    public static final String CREDIT       = "MerchantCreditWTCost";
-    public static final String CURRENCY     = "DefaultCurrency";
-    public static final String SETTLEMENT   = "Settlement";
-    public static final String EQUIPMENT    = "Equipments";
-    public static final String LEASE        = "Lease";
-    public static final String TOTAL_LEASE  = "TotalLease";
-    public static final String ACCOUNT      = "account";
-    public static final String PURCHASE     = "purchase_price";
-    public static final String AMOUNT_DELTA = "amount_delta";
-    ///////////////////////////////////////////////////////////////////////
 
     /** Server Response POJO */
     public static ServerResponse response = null;

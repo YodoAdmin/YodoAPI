@@ -16,9 +16,10 @@ public class AppUtils {
      * @return true  It is a number.
      *         false It is not a number.
      */
-    public static Boolean isNumber(String s) {
+    @SuppressWarnings( "ResultOfMethodCallIgnored" )
+    public static Boolean isNumber( String s) {
         try {
-            Integer.parseInt(s);
+            Integer.parseInt( s );
         }
         catch( NumberFormatException e ) {
             return false;
