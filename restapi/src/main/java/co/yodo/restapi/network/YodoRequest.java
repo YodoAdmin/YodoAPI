@@ -53,9 +53,11 @@ public class YodoRequest {
     private static final String TAG = YodoRequest.class.getSimpleName();
 
     /** Switch server IP address */
-    private static final String PROD_IP = "http://50.56.180.133";   // Production
-    private static final String DEV_IP  = "http://198.101.209.120"; // Development
-    private static final String IP      = DEV_IP;
+    private static final String PROD_IP  = "http://50.56.180.133";   // Production
+    private static final String DEMO_IP  = "http://198.101.209.120"; // Demo
+    private static final String DEV_IP   = "http://162.244.228.78";  // Development
+    private static final String LOCAL_IP = "http://192.168.1.33";    // Local
+    private static String IP = DEMO_IP;
 
     /** Two paths used for the requests */
     private static final String YODO         = "/yodo/";
@@ -63,10 +65,11 @@ public class YodoRequest {
 
     /** Timeout for the requests */
     private final static int TIMEOUT = 1000 * 10; // 10 seconds
+    private final static int RETRIES = 0;
 
     private RetryPolicy retryPolicy = new DefaultRetryPolicy(
             TIMEOUT,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            RETRIES,
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
     );
 
@@ -159,11 +162,15 @@ public class YodoRequest {
 
     /**
      * Returns an string that represents the server of the IP
-     * @return P - production
-     *         D - development
+     * @return P  - production
+     *         De - demo
+     *         D  - development
+     *         L  - local
      */
     public static String getSwitch() {
-        return ( IP.equals( PROD_IP ) ) ? "P" : "D";
+        return ( IP.equals( PROD_IP ) ) ? "P" :
+               ( IP.equals( DEMO_IP ) ) ? "De" :
+               ( IP.equals( LOCAL_IP ) ) ? "L" : "D";
     }
 
     /**
