@@ -42,6 +42,7 @@ import co.yodo.restapi.network.builder.ServerRequest;
 import co.yodo.restapi.network.handler.JSONHandler;
 import co.yodo.restapi.network.handler.XMLHandler;
 import co.yodo.restapi.network.model.ServerResponse;
+import okhttp3.OkHttpClient;
 
 /**
  * Created by hei on 26/04/16.
@@ -53,19 +54,19 @@ public class YodoRequest {
     private static final String TAG = YodoRequest.class.getSimpleName();
 
     /** Switch server IP address */
-    private static final String PROD_IP  = "http://50.56.180.133";   // Production
-    private static final String DEMO_IP  = "http://198.101.209.120"; // Demo
-    private static final String DEV_IP   = "http://162.244.228.78";  // Development
-    private static final String LOCAL_IP = "http://192.168.1.33";    // Local
-    private static String IP = DEMO_IP;
+    public static final String PROD_IP  = "http://50.56.180.133";   // Production
+    public static final String DEMO_IP  = "http://198.101.209.120"; // Demo
+    public static final String DEV_IP   = "http://162.244.228.78";  // Development
+    public static final String LOCAL_IP = "http://192.168.1.33";    // Local
+    public static String IP = DEMO_IP;
 
     /** Two paths used for the requests */
     private static final String YODO         = "/yodo/";
     private static final String YODO_ADDRESS = "/yodo/yodoswitchrequest/getRequest/";
 
     /** Timeout for the requests */
-    private final static int TIMEOUT = 1000 * 10; // 10 seconds
-    private final static int RETRIES = 0;
+    private final static int TIMEOUT = 1000 * 20; // 20 seconds
+    private final static int RETRIES = -1; // No retries
 
     private RetryPolicy retryPolicy = new DefaultRetryPolicy(
             TIMEOUT,
@@ -131,7 +132,10 @@ public class YodoRequest {
         if( mRequestQueue == null ) {
             // getApplicationContext() is key, it keeps you from leaking the
             // Activity or BroadcastReceiver if someone passes one in.
-            mRequestQueue = Volley.newRequestQueue( mCtx );
+            mRequestQueue = Volley.newRequestQueue(
+                    mCtx,
+                    new OkHttp3Stack( new OkHttpClient() )
+            );
         }
         return mRequestQueue;
     }
@@ -227,9 +231,8 @@ public class YodoRequest {
                     }
                 }
         );
-        httpRequest.setTag( "GET" );
-        httpRequest.setRetryPolicy( retryPolicy );
-        getRequestQueue().add( httpRequest );
+
+        addToRequestQueue( httpRequest );
     }
 
     /**
@@ -289,7 +292,17 @@ public class YodoRequest {
                     }
                 }
         );
-        httpRequest.setTag( "GET" );
+
+        addToRequestQueue( httpRequest );
+    }
+
+    /**
+     * Adds a request to the queue to be executed
+     * @param httpRequest The request
+     * @param <T> The type of the request
+     */
+    public <T> void addToRequestQueue( Request<T> httpRequest ) {
+        httpRequest.setTag( TAG );
         httpRequest.setRetryPolicy( retryPolicy );
         getRequestQueue().add( httpRequest );
     }
