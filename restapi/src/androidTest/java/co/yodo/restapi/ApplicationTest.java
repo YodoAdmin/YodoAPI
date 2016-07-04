@@ -232,6 +232,11 @@ public class ApplicationTest extends ApplicationTestCase<Application> implements
     }
 
     @Override
+    public void onPrepare() {
+
+    }
+
+    @Override
     public void onResponse( int responseCode, ServerResponse response ) {
         this.response = response;
         semaphore.release();

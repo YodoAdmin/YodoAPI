@@ -6,5 +6,5 @@ package co.yodo.restapi.helper;
  */
 public class AppConfig {
     /** DEBUG flag: to print the logs in console */
-    public static final boolean DEBUG = true;
+    public static boolean DEBUG = false;
 }
