@@ -31,10 +31,12 @@ public class Encrypter {
     private static String PUBLIC_KEY;
 
     static {
-        if( YodoRequest.getSwitch().equals( "P" ) )
-            PUBLIC_KEY = "YodoKey/Prod/12.public.der";
+		if( YodoRequest.getSwitch().equals( "P" ) )
+			PUBLIC_KEY = "YodoKey/Prod/12.public.der";
+        else if( YodoRequest.getSwitch().equals( "L" ) )
+            PUBLIC_KEY = "YodoKey/Local/12.public.der";
         else
-            PUBLIC_KEY = "YodoKey/Dev/12.public.der";
+            PUBLIC_KEY = "YodoKey/Dev/12.public.der"; // Dev - Demo
     }
 	
 	/**

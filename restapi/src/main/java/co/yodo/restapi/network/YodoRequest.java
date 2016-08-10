@@ -58,7 +58,7 @@ public class YodoRequest {
     public static final String DEMO_IP  = "http://198.101.209.120"; // Demo
     public static final String DEV_IP   = "http://162.244.228.78";  // Development
     public static final String LOCAL_IP = "http://192.168.1.33";    // Local
-    public static String IP = DEMO_IP;
+    public static String IP = PROD_IP;
 
     /** Two paths used for the requests */
     private static final String YODO         = "/yodo/";
@@ -178,7 +178,7 @@ public class YodoRequest {
      */
     public static String getSwitch() {
         return ( IP.equals( PROD_IP ) ) ? "P" :
-               ( IP.equals( DEMO_IP ) ) ? "De" :
+               ( IP.equals( DEMO_IP ) ) ? "E" :
                ( IP.equals( LOCAL_IP ) ) ? "L" : "D";
     }
 
