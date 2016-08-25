@@ -117,7 +117,7 @@ public class ServerRequest {
         sRegistrationRequest.append( PROTOCOL_VERSION ).append( REQ_SEP );
         sRegistrationRequest.append( REG_RT ).append( REQ_SEP );
         sRegistrationRequest.append( iRegST ).append( REQ_SEP );
-        sRegistrationRequest.append(pUsrData);
+        sRegistrationRequest.append( pUsrData );
 
         AppUtils.Logger( 'd', TAG, "Registration Request: " + sRegistrationRequest.toString() );
         return sRegistrationRequest.toString();
