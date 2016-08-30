@@ -7,33 +7,14 @@ import android.util.Log;
  * Created by hei on 26/04/16.
  * Utilities for the App
  */
-public class AppUtils {
-    /**
-     * A simple check to see if a string is a valid number before inserting
-     * into the shared preferences.
-     *
-     * @param s The number to be checked.
-     * @return true  It is a number.
-     *         false It is not a number.
-     */
-    @SuppressWarnings( "ResultOfMethodCallIgnored" )
-    public static Boolean isNumber( String s) {
-        try {
-            Integer.parseInt( s );
-        }
-        catch( NumberFormatException e ) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
+public class SystemUtils {
+     /**
      * Logger for the application, depending on the flag DEBUG
      * @param type The char type of the log
      * @param TAG The String used to know to which class the log belongs
      * @param text The String to output on the log
      */
-    public static void Logger( char type, @NonNull String TAG, String text ) {
+     private static void Logger( char type, String TAG, String text ) {
         if( text == null ) {
             Log.e( TAG, "NULL Message" );
             return;
@@ -62,5 +43,21 @@ public class AppUtils {
                     break;
             }
         }
+    }
+
+    public static void iLogger( @NonNull String TAG, String text ) {
+        Logger( 'i', TAG, text );
+    }
+
+    public static void wLogger( @NonNull String TAG, String text ) {
+        Logger( 'w', TAG, text );
+    }
+
+    public static void dLogger( @NonNull String TAG, String text ) {
+        Logger( 'd', TAG, text );
+    }
+
+    public static void eLogger( @NonNull String TAG, String text ) {
+        Logger( 'e', TAG, text );
     }
 }

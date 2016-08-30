@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import co.yodo.restapi.network.model.Params;
 import co.yodo.restapi.network.model.ServerResponse;
 
 /**
@@ -33,6 +34,7 @@ public class JSONHandler {
      */
     public ServerResponse parseCurrencies( JSONArray array ) {
         ServerResponse response = new ServerResponse();
+        Params params = new Params();
 
         for( int i = 0; i < array.length(); i++ ) {
             try {
@@ -43,15 +45,16 @@ public class JSONHandler {
 
                 // Gets the Merchant Currency
                 if( currency.equals( MERCHANT_CURRENCY ) )
-                    response.addParam( ServerResponse.MERCH_RATE, rate );
+                    params.setMerchRate( rate );
                 // Gets the fare currency
                 if( currency.equals( TENDER_CURRENCY ) )
-                    response.addParam( ServerResponse.TENDER_RATE, rate );
+                    params.setTenderRate( rate );
             } catch( JSONException e ) {
                 e.printStackTrace();
             }
         }
 
+        response.setParams( params );
         return response;
     }
 }
