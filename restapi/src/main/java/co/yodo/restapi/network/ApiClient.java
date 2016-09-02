@@ -173,8 +173,10 @@ public class ApiClient {
         sResponse.enqueue( new Callback<ServerResponse>() {
             @Override
             public void onResponse( Call<ServerResponse> call, Response<ServerResponse> response ) {
-                SystemUtils.dLogger( TAG, response.body().toString() );
-                mListener.onResponse( responseCode, response.body() );
+                ServerResponse temp = response.body();
+                if( temp != null )
+                    SystemUtils.dLogger( TAG, response.body().toString() );
+                mListener.onResponse( responseCode, temp );
             }
 
             @Override
