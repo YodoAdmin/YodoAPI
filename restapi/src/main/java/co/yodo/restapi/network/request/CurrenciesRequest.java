@@ -1,9 +1,5 @@
 package co.yodo.restapi.network.request;
 
-import android.content.Context;
-
-import javax.inject.Inject;
-
 import co.yodo.restapi.component.cipher.RSACrypt;
 import co.yodo.restapi.network.ApiClient;
 import co.yodo.restapi.network.handler.JSONHandler;

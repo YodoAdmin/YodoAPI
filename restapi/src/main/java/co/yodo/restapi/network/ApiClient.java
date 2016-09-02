@@ -44,8 +44,8 @@ public class ApiClient {
     public static final String PROD_IP  = "http://50.56.180.133";   // Production
     public static final String DEMO_IP  = "http://198.101.209.120"; // Demo
     public static final String DEV_IP   = "http://162.244.228.78";  // Development
-    public static final String LOCAL_IP = "http://192.168.1.33";    // Local
-    public static String IP = DEMO_IP;
+    public static final String LOCAL_IP = "http://192.168.1.36";    // Local
+    public static String IP = LOCAL_IP;
 
     /** Object used to send the requests to the server */
     @Inject

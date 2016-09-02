@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements ApiClient.Request
                 )
         );
 
-        /*mRequestManager.invoke(
+        mRequestManager.invoke(
                 new ExchangeRequest(
                         EXCH_REQ,
                         "4C21D00D7ABD",
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements ApiClient.Request
                         "test",
                         QueryRequest.Record.TODAY_BALANCE
                 )
-        );*/
+        );
 
         mRequestManager.invoke(
                 new CurrenciesRequest(
