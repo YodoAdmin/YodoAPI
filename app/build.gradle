@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.0 rc3"
+    buildToolsVersion "24.0.0"
 
     defaultConfig {
         applicationId "co.yodo.yodoapi"
@@ -10,6 +10,8 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -17,8 +19,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    useLibrary 'org.apache.http.legacy'
+    dexOptions {
+        maxProcessCount 4
+        javaMaxHeapSize "2g"
+    }
 }
 
 repositories {
@@ -28,10 +32,11 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.android.support:design:24.0.0'
-    compile 'com.android.volley:volley:1.0.0'
-    compile(name: 'restapi-release', ext: 'aar')
+    // -- Android --
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:design:24.2.0'
+    // -- Others --
+    compile project(':restapi')
 }
