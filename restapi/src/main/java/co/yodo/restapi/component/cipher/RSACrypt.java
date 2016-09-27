@@ -37,7 +37,8 @@ public class RSACrypt {
 		else if( ApiClient.getSwitch().equals( "D" ) )
 			PUBLIC_KEY = "YodoKey/Dev/2048.public.der";
 		else // Demo
-			PUBLIC_KEY = "YodoKey/Dev/512.public.der";
+			PUBLIC_KEY = "YodoKey/Demo/2048.public.der";
+			//PUBLIC_KEY = "YodoKey/Dev/512.public.der";
 	}
 
 	private final PublicKey mPubKey;

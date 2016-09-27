@@ -34,7 +34,6 @@ public class ApiClientModule {
         return logging;
     }
 
-
     @Provides
     @ApplicationScope
     OkHttpClient providesOkHttpClient( HttpLoggingInterceptor logging ) {

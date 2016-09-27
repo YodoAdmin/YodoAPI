@@ -27,6 +27,14 @@ public class AlternateRequest extends IRequest {
     /** Alternate request type */
     private static final String ALTER_RT = "7";
 
+    /**
+     * VISA_CRED_ST   - 1
+     * HEART_ST       - 3
+     * VISA_PREP_ST   - 4
+     * PAYPAL_ST      - 5
+     * PUB_TRANSIT_ST - 6
+     */
+
     /** Sub-type of the request */
     private final String mRequestST;
 
@@ -65,8 +73,8 @@ public class AlternateRequest extends IRequest {
         mEncyptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
         mEncyptedData =
                 AESCrypt.encrypt( mPrimaryClient, key )   + REQ_SEP +
-                        AESCrypt.encrypt( mSecondaryClient, key ) + REQ_SEP +
-                        AESCrypt.encrypt( mFormattedData, key );
+                AESCrypt.encrypt( mSecondaryClient, key ) + REQ_SEP +
+                AESCrypt.encrypt( mFormattedData, key );
 
         // Encrypting to create request
         /* mEncyptedData =

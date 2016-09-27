@@ -23,7 +23,7 @@ public abstract class IRequest {
     protected final int mResponseCode;
 
     /** Protocol version used in the requests */
-    protected static final String PROTOCOL_VERSION = "1.1.5";
+    private static final String PROTOCOL_VERSION = "1.1.6";
 
     /** Two paths used for the requests */
     protected static final String YODO         = "/yodo/";
