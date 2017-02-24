@@ -39,7 +39,7 @@ public class RegisterRequest extends IRequest {
      */
     public RegisterRequest( int responseCode, String hardwareToken, String activationCode ) {
         super( responseCode );
-        mFormattedData =
+        formattedData =
                 hardwareToken  + REQ_SEP +
                 activationCode + REQ_SEP +
                 System.currentTimeMillis() / 1000L;
@@ -51,14 +51,14 @@ public class RegisterRequest extends IRequest {
 
         SecretKeySpec key = AESCrypt.generateKey();
 
-        mEncyptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
-        mEncyptedData = AESCrypt.encrypt( mFormattedData, key );
+        encryptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
+        encryptedData = AESCrypt.encrypt( formattedData, key );
 
         // Encrypting to create request
-        //mEncyptedData = oEncrypter.encrypt( mFormattedData );
+        //encryptedData = oEncrypter.encrypt( formattedData );
         sEncryptedClientData =
-                mEncyptedKey + REQ_SEP +
-                mEncyptedData;
+                encryptedKey + REQ_SEP +
+                        encryptedData;
 
         pRequest = buildRequest( REG_RT,
                 REG_MERCH_ST,
@@ -67,6 +67,6 @@ public class RegisterRequest extends IRequest {
 
         IApiEndpoint iCaller = oManager.create( IApiEndpoint.class );
         Call<ServerResponse> sResponse = iCaller.register( pRequest );
-        oManager.sendRequest( sResponse, mResponseCode );
+        oManager.sendXMLRequest( sResponse, responseCode );
     }
 }

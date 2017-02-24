@@ -42,45 +42,29 @@ public class ApiClient {
 
     /** Switch server IP address */
     public static final String PROD_IP  = "http://50.56.180.133";   // Production
-    //public static final String DEMO_IP  = "http://198.101.209.120"; // Demo
     public static final String DEMO_IP  = "http://162.244.228.84";  // Demo
     public static final String DEV_IP   = "http://162.244.228.78";  // Development
-    public static final String LOCAL_IP = "http://192.168.1.36";    // Local
-    public static String IP = LOCAL_IP;
+    public static String IP = DEV_IP;
 
     /** Object used to send the requests to the server */
     @Inject
-    Retrofit mRetrofit;
+    Retrofit networkManager;
 
     /** Object used to encrypt information */
     @Inject
-    RSACrypt mEncrypter;
-
-    /** Dir to save cached files */
-    private final File mFile;
+    RSACrypt cipher;
 
     /** Component that build the dependencies */
-    private static GraphComponent mComponent;
+    private static GraphComponent injectionComponent;
 
     /** The external listener to the service */
-    private RequestsListener mListener;
+    private RequestsListener listener;
 
     /** Singleton instance */
-    private static ApiClient mInstance = null;
+    private static ApiClient instance = null;
 
-    public interface RequestsListener {
-        /**
-         * Listener for the preparation of the request
-         */
-        void onPrepare();
-
-        /**
-         * Listener for the server responses
-         * @param responseCode Code of the request
-         * @param response POJO for the response
-         */
-        void onResponse( int responseCode, ServerResponse response );
-    }
+    /** Dir to save cached files */
+    private final File currenciesFile;
 
     /**
      * private constructor for the singleton
@@ -91,15 +75,15 @@ public class ApiClient {
                 .applicationModule( new ApplicationModule( context ) )
                 .build();
 
-        mComponent = DaggerGraphComponent.builder()
+        injectionComponent = DaggerGraphComponent.builder()
                 .applicationComponent( appComponent )
                 .apiClientModule( new ApiClientModule( IP ) )
                 .build();
 
-        mComponent.inject( this );
+        injectionComponent.inject( this );
 
         // Get the currencies file
-        mFile = new File( context.getCacheDir(), "currencies.json" );
+        currenciesFile = new File( context.getCacheDir(), "currencies.json" );
     }
 
     /**
@@ -107,9 +91,9 @@ public class ApiClient {
      * @return instance
      */
     public static synchronized ApiClient getInstance( Context context ) {
-        if( mInstance == null )
-            mInstance = new ApiClient( context );
-        return mInstance;
+        if( instance == null )
+            instance = new ApiClient( context );
+        return instance;
     }
 
     /**
@@ -138,7 +122,7 @@ public class ApiClient {
      * @return GraphComponent
      */
     public static GraphComponent getComponent() {
-        return mComponent;
+        return injectionComponent;
     }
 
     /**
@@ -148,15 +132,22 @@ public class ApiClient {
      * @return An object to call the request
      */
     public <T> T create( Class<T> service ) {
-        return mRetrofit.create( service );
+        return networkManager.create( service );
     }
 
     /**
      * Sets a listener for the service
      * @param listener Listener for the requests to the server
      */
-    public void setListener( RequestsListener listener ) {
-        this.mListener = listener ;
+    public void subscribe( RequestsListener listener ) {
+        this.listener = listener ;
+    }
+
+    /**
+     * Removes the listener for the service
+     */
+    public void unsubscribe() {
+        this.listener = null;
     }
 
     /**
@@ -164,33 +155,27 @@ public class ApiClient {
      * @param request The request to be executed
      */
     public void invoke( IRequest request ) {
-        if( mListener == null )
+        if( listener == null )
             throw new NullPointerException( "Listener not defined" );
 
-        request.execute( mEncrypter, this );
+        request.execute( cipher, this );
     }
 
-    public void sendRequest( Call<ServerResponse> sResponse, final int responseCode ) {
+    public void sendXMLRequest( Call<ServerResponse> sResponse, final int responseCode ) {
         sResponse.enqueue( new Callback<ServerResponse>() {
             @Override
             public void onResponse( Call<ServerResponse> call, Response<ServerResponse> response ) {
-                ServerResponse temp = response.body();
-                if( temp != null )
+                try {
                     SystemUtils.dLogger( TAG, response.body().toString() );
-                mListener.onResponse( responseCode, temp );
+                    listener.onResponse( responseCode, response.body() );
+                } catch( NullPointerException e ) {
+                    handleFailure( e );
+                }
             }
 
             @Override
             public void onFailure( Call<ServerResponse> call, Throwable error ) {
-                error.printStackTrace();
-
-                // depending on the error, return an alert to the activity
-                ServerResponse response = new ServerResponse();
-                if( error instanceof IOException )  // Network error
-                    response.setCode( ServerResponse.ERROR_NETWORK );
-                else
-                    response.setCode( ServerResponse.ERROR_FAILED );
-                mListener.onResponse( responseCode, response );
+                handleFailure( error );
             }
         } );
     }
@@ -200,8 +185,8 @@ public class ApiClient {
         final int MAX_AGE = 6 * 60 * 60 * 1000; // 6 hours (1000 = 1 sec)
 
         //Find the dir to save cached files
-        boolean exists = mFile.exists();
-        if( !exists || mFile.lastModified() + MAX_AGE < System.currentTimeMillis() ) {
+        boolean exists = currenciesFile.exists();
+        if( !exists || currenciesFile.lastModified() + MAX_AGE < System.currentTimeMillis() ) {
             sResponse.enqueue( new Callback<ResponseBody>() {
                 @Override
                 public void onResponse( Call<ResponseBody> call, Response<ResponseBody> response ) {
@@ -209,19 +194,19 @@ public class ApiClient {
                         JSONArray json = new JSONArray( response.body().string() );
 
                         try {
-                            FileWriter writer = new FileWriter( mFile.getAbsolutePath() );
+                            FileWriter writer = new FileWriter( currenciesFile.getAbsolutePath() );
                             writer.write( json.toString() );
                             writer.flush();
                             writer.close();
                         } catch( IOException e ) {
                             e.printStackTrace();
-                            if( mFile.exists() )
-                                mFile.delete();
+                            if( currenciesFile.exists() )
+                                currenciesFile.delete();
                         }
 
                         ServerResponse data = handler.parseCurrencies( json );
                         SystemUtils.dLogger( TAG, data.toString() );
-                        mListener.onResponse( responseCode, data );
+                        listener.onResponse( responseCode, data );
                     } catch( IOException | JSONException e ) {
                         e.printStackTrace();
                     }
@@ -229,20 +214,12 @@ public class ApiClient {
 
                 @Override
                 public void onFailure( Call<ResponseBody> call, Throwable error ) {
-                    error.printStackTrace();
-
-                    // depending on the error, return an alert to the activity
-                    ServerResponse response = new ServerResponse();
-                    if( error instanceof IOException )  // Network error
-                        response.setCode( ServerResponse.ERROR_NETWORK );
-                    else
-                        response.setCode( ServerResponse.ERROR_FAILED );
-                    mListener.onResponse( responseCode, response );
+                    handleFailure( error );
                 }
             } );
         } else {
             try {
-                FileInputStream fin   = new FileInputStream( mFile );
+                FileInputStream fin   = new FileInputStream( currenciesFile );
                 BufferedReader reader = new BufferedReader( new InputStreamReader( fin ) );
                 StringBuilder sb      = new StringBuilder();
                 String line;
@@ -256,14 +233,48 @@ public class ApiClient {
                 // Transform the text to JSONArray
                 JSONArray json = new JSONArray( sb.toString() );
                 if( json.length() <= 0 )
-                    mFile.delete();
+                    currenciesFile.delete();
 
                 ServerResponse data = handler.parseCurrencies( json );
                 SystemUtils.dLogger( TAG, data.toString() );
-                mListener.onResponse( responseCode, data );
+                listener.onResponse( responseCode, data );
             } catch ( IOException | JSONException e ) {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Handles the error for the request
+     * @param error The error object
+     */
+    private void handleFailure( Throwable error ) {
+        error.printStackTrace();
+        listener.onError( error );
+        /*if( error instanceof IOException ) {
+            // Network error
+            listener.onError( error, NETWORK_ERROR );
+        } else if( error instanceof NullPointerException  )  {
+            // Server error
+            listener.onError( error, SERVER_ERROR );
+        } else {
+            // Another error
+            listener.onError( error, UNKNOWN_ERROR );
+        }*/
+    }
+
+    public interface RequestsListener {
+        /**
+         * Listener for the server responses
+         * @param responseCode Code of the request
+         * @param response POJO for the response
+         */
+        void onResponse( int responseCode, ServerResponse response );
+
+        /**
+         * Wherever an error appears
+         * @param error The error object
+         */
+        void onError( Throwable error );
     }
 }

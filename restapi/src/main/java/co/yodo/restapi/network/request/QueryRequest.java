@@ -56,7 +56,7 @@ public class QueryRequest extends IRequest {
      */
     public QueryRequest( int responseCode, String hardwareToken, Record record ) {
         super( responseCode );
-        mFormattedData =
+        formattedData =
                 hardwareToken + REQ_SEP +
                 record.getValue();
     }
@@ -67,7 +67,7 @@ public class QueryRequest extends IRequest {
      */
     public QueryRequest( int responseCode, String hardwareToken, String merchPip, Record record ) {
         super( responseCode );
-        mFormattedData =
+        formattedData =
                 hardwareToken + REQ_SEP +
                 merchPip      + REQ_SEP +
                 record.getValue();
@@ -79,14 +79,14 @@ public class QueryRequest extends IRequest {
 
         SecretKeySpec key = AESCrypt.generateKey();
 
-        mEncyptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
-        mEncyptedData = AESCrypt.encrypt( mFormattedData, key );
+        encryptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
+        encryptedData = AESCrypt.encrypt( formattedData, key );
 
         // Encrypting to create request
-        // mEncyptedData = oEncrypter.encrypt( mFormattedData );
+        // encryptedData = oEncrypter.encrypt( formattedData );
         sEncryptedClientData =
-                mEncyptedKey + REQ_SEP +
-                mEncyptedData;
+                encryptedKey + REQ_SEP +
+                        encryptedData;
 
         pRequest = buildRequest( QUERY_RT,
                 QUERY_ACC_ST,
@@ -95,6 +95,6 @@ public class QueryRequest extends IRequest {
 
         IApiEndpoint iCaller = oManager.create( IApiEndpoint.class );
         Call<ServerResponse> sResponse = iCaller.query( pRequest );
-        oManager.sendRequest( sResponse, mResponseCode );
+        oManager.sendXMLRequest( sResponse, responseCode );
     }
 }

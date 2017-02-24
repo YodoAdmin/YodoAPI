@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
-        versionName "1.1"
+        versionName "1.2"
     }
     buildTypes {
         release {
@@ -21,10 +21,17 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    // -- Testing --
     testCompile 'junit:junit:4.12'
+
     // -- Android --
-    compile 'com.android.support:support-annotations:24.2.0'
-    // -- Retrofit --
+    compile 'com.android.support:support-annotations:25.1.0'
+
+    // -- Logging --
+    compile 'com.jakewharton.timber:timber:4.5.1'
+
+    // -- Networking --
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile ('com.squareup.retrofit2:converter-simplexml:2.1.0') {
         exclude group: 'xpp3', module: 'xpp3'
@@ -32,8 +39,9 @@ dependencies {
         exclude group: 'stax', module: 'stax'
     }
     compile 'com.squareup.okhttp3:logging-interceptor:3.3.0'
+
     // -- Dagger 2 --
-    apt 'com.google.dagger:dagger-compiler:2.5'
-    compile 'com.google.dagger:dagger:2.5'
+    apt 'com.google.dagger:dagger-compiler:2.9'
+    compile 'com.google.dagger:dagger:2.9'
     provided 'javax.annotation:jsr250-api:1.0'
 }

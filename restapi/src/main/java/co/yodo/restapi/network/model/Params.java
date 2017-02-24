@@ -5,8 +5,17 @@ import org.simpleframework.xml.Root;
 
 @Root( strict = false )
 public class Params {
+    @Element( name = "merchant", required = false )
+    private String merchant;
+
+    @Element( name = "tender_currency", required = false )
+    private String tenderCurrency;
+
     @Element( name = "account", required = false )
     private String account;
+
+    @Element( name = "created", required = false )
+    private String created;
 
     @Element( name = "purchase_price", required = false )
     private String purchase;
@@ -44,9 +53,24 @@ public class Params {
     @Element( name = "logo_url", required = false )
     private String logo;
 
+    @Element( name = "account_bal", required = false )
+    private String accountBalance;
+
     /** Getters */
+    public String getMerchant() {
+        return merchant;
+    }
+
+    public String getTenderCurrency() {
+        return tenderCurrency;
+    }
+
     public String getAccount() {
         return account;
+    }
+
+    public String getCreated() {
+        return created;
     }
 
     public String getPurchase() {
@@ -97,6 +121,10 @@ public class Params {
         return logo;
     }
 
+    public String getAccountBalance() {
+        return accountBalance;
+    }
+
     public void setTenderRate( String rate ) {
         this.tenderRate = rate;
     }
@@ -110,19 +138,23 @@ public class Params {
     @Override
     public String toString() {
         return "[" +
-                "Account = "      + account     + ", " +
-                "Purchase = "     + purchase    + ", " +
-                "Amount Delta = " + amountDelta + ", " +
-                "Merch Rate = "   + merchRate   + ", " +
-                "Tender Rate = "  + tenderRate  + ", " +
-                "Debit = "        + debit       + ", " +
-                "Credit = "       + credit      + ", " +
-                "Settlement = "   + settlement  + ", " +
-                "Equipment = "    + equipment   + ", " +
-                "Lease = "        + lease       + ", " +
-                "Total Lease = "  + totalLease  + ", " +
-                "Currency = "     + currency    + ", " +
-                "Logo = "         + logo +
+                "Merchant = "        + merchant       + ", " +
+                "Tender Currency = " + tenderCurrency + ", " +
+                "Created = "         + created        + ", " +
+                "Account = "         + account        + ", " +
+                "Purchase = "        + purchase       + ", " +
+                "Amount Delta = "    + amountDelta    + ", " +
+                "Merch Rate = "      + merchRate      + ", " +
+                "Tender Rate = "     + tenderRate     + ", " +
+                "Debit = "           + debit          + ", " +
+                "Credit = "          + credit         + ", " +
+                "Settlement = "      + settlement     + ", " +
+                "Equipment = "       + equipment      + ", " +
+                "Lease = "           + lease          + ", " +
+                "Total Lease = "     + totalLease     + ", " +
+                "Currency = "        + currency       + ", " +
+                "Logo = "            + logo           + ", " +
+                "Account Balance = " + accountBalance +
                 "]";
     }
 }

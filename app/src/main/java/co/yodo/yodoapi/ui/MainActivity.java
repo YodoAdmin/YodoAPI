@@ -143,4 +143,9 @@ public class MainActivity extends AppCompatActivity implements ApiClient.Request
                 break;
         }
     }
+
+    @Override
+    public void onError( Throwable error, String message ) {
+
+    }
 }

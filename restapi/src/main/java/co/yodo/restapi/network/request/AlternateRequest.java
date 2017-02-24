@@ -21,13 +21,14 @@ public class AlternateRequest extends IRequest {
     private static final String TAG = AlternateRequest.class.getSimpleName();
 
     /** Exchange data */
-    private final String mPrimaryClient;
-    private final String mSecondaryClient;
+    private final String primaryClient;
+    private final String secondaryClient;
 
     /** Alternate request type */
     private static final String ALTER_RT = "7";
 
     /**
+     * CASH_ST        - 0
      * VISA_CRED_ST   - 1
      * HEART_ST       - 3
      * VISA_PREP_ST   - 4
@@ -36,10 +37,10 @@ public class AlternateRequest extends IRequest {
      */
 
     /** Sub-type of the request */
-    private final String mRequestST;
+    private final String requestST;
 
     /** Interface for the ALTER requests */
-    public interface IApiEndpoint {
+    interface IApiEndpoint {
         @GET( YODO_ADDRESS + "{request}" )
         Call<ServerResponse> alternate( @Path( "request" ) String request );
     }
@@ -52,10 +53,10 @@ public class AlternateRequest extends IRequest {
                             String total, String cashTender, String cashBack,
                             double latitude, double longitude, String currency ) {
         super( responseCode );
-        mRequestST = subType;
-        mPrimaryClient = hardwareToken;
-        mSecondaryClient = client;
-        mFormattedData =
+        requestST = subType;
+        primaryClient = hardwareToken;
+        secondaryClient = client;
+        formattedData =
                 latitude   + REQ_SEP +
                 longitude  + REQ_SEP +
                 total      + REQ_SEP +
@@ -65,34 +66,28 @@ public class AlternateRequest extends IRequest {
     }
 
     @Override
-    public void execute( RSACrypt oEncrypter, ApiClient oManager ) {
+    public void execute( RSACrypt encrypter, ApiClient manager ) {
         String sEncryptedClientData, pRequest;
 
         SecretKeySpec key = AESCrypt.generateKey();
 
-        mEncyptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
-        mEncyptedData =
-                AESCrypt.encrypt( mPrimaryClient, key )   + REQ_SEP +
-                AESCrypt.encrypt( mSecondaryClient, key ) + REQ_SEP +
-                AESCrypt.encrypt( mFormattedData, key );
-
-        // Encrypting to create request
-        /* mEncyptedData =
-                oEncrypter.encrypt( mPrimaryClient ) + REQ_SEP +
-                mSecondaryClient                     + REQ_SEP +
-                oEncrypter.encrypt( mFormattedData );*/
+        encryptedKey = encrypter.encrypt( AESCrypt.encodeKey( key ) );
+        encryptedData =
+                AESCrypt.encrypt( primaryClient, key )   + REQ_SEP +
+                AESCrypt.encrypt( secondaryClient, key ) + REQ_SEP +
+                AESCrypt.encrypt( formattedData, key );
 
         sEncryptedClientData =
-                mEncyptedKey + REQ_SEP +
-                mEncyptedData;
+                encryptedKey + REQ_SEP +
+                        encryptedData;
 
         pRequest = buildRequest( ALTER_RT,
-                mRequestST,
+                requestST,
                 sEncryptedClientData
         );
 
-        IApiEndpoint iCaller = oManager.create( IApiEndpoint.class );
+        IApiEndpoint iCaller = manager.create( IApiEndpoint.class );
         Call<ServerResponse> sResponse = iCaller.alternate( pRequest );
-        oManager.sendRequest( sResponse, mResponseCode );
+        manager.sendXMLRequest( sResponse, responseCode );
     }
 }

@@ -17,10 +17,6 @@ public class ServerResponse {
     public static final String AUTHORIZED_TRANSFER     = "AU88";
 
     /** ID for error responses */
-    public static final String ERROR_UNKOWN        = "UNKN";
-    public static final String ERROR_NETWORK       = "NCON";
-    public static final String ERROR_TIMEOUT       = "TOUT";
-    public static final String ERROR_SERVER        = "ESRV";
     public static final String ERROR_FAILED        = "ER00";
     public static final String ERROR_MAX_LIM       = "ER13";
     public static final String ERROR_DUP_AUTH      = "ER20";

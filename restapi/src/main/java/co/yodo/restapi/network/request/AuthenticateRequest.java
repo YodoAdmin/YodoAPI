@@ -54,7 +54,7 @@ public class AuthenticateRequest extends IRequest {
      */
     public AuthenticateRequest( int responseCode, String hardwareToken ) {
         super( responseCode );
-        mFormattedData = hardwareToken;
+        formattedData = hardwareToken;
         mRequestST = AuthST.HW;
     }
 
@@ -65,7 +65,7 @@ public class AuthenticateRequest extends IRequest {
      */
     public AuthenticateRequest( int responseCode, String hardwareToken, String merchPip ) {
         super( responseCode );
-        mFormattedData =
+        formattedData =
                 hardwareToken + PCLIENT_SEP +
                 merchPip      + PCLIENT_SEP +
                 System.currentTimeMillis() / 1000L;
@@ -78,14 +78,13 @@ public class AuthenticateRequest extends IRequest {
 
         SecretKeySpec key = AESCrypt.generateKey();
 
-        mEncyptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
-        mEncyptedData = AESCrypt.encrypt( mFormattedData, key );
+        encryptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
+        encryptedData = AESCrypt.encrypt( formattedData, key );
 
         // Encrypting to create request
-        // mEncyptedData = oEncrypter.encrypt( mFormattedData );
         sEncryptedClientData =
-                mEncyptedKey + REQ_SEP +
-                mEncyptedData;
+                encryptedKey + REQ_SEP +
+                        encryptedData;
 
         pRequest = buildRequest( AUTH_RT,
                 mRequestST.getValue(),
@@ -94,6 +93,6 @@ public class AuthenticateRequest extends IRequest {
 
         IApiEndpoint iCaller = oManager.create( IApiEndpoint.class );
         Call<ServerResponse> sResponse = iCaller.authUser( pRequest );
-        oManager.sendRequest( sResponse, mResponseCode );
+        oManager.sendXMLRequest( sResponse, responseCode );
     }
 }

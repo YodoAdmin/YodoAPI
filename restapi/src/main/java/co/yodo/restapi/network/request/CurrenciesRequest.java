@@ -41,6 +41,6 @@ public class CurrenciesRequest extends IRequest {
         JSONHandler handler = new JSONHandler( mMerchantCur, mTenderCur );
         IApiEndpoint iCaller = oManager.create( IApiEndpoint.class );
         Call<ResponseBody> sResponse = iCaller.currencies();
-        oManager.sendArrayRequest( sResponse, mResponseCode, handler );
+        oManager.sendArrayRequest( sResponse, responseCode, handler );
     }
 }

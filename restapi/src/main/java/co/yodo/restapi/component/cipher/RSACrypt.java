@@ -30,18 +30,22 @@ public class RSACrypt {
 	private static String PUBLIC_KEY;
 
 	static {
-		if( ApiClient.getSwitch().equals( "P" ) )
-			PUBLIC_KEY = "YodoKey/Prod/512.public.der";
-		else if( ApiClient.getSwitch().equals( "L" ) )
-			PUBLIC_KEY = "YodoKey/Local/2048.public.der";
-		else if( ApiClient.getSwitch().equals( "D" ) )
-			PUBLIC_KEY = "YodoKey/Dev/2048.public.der";
-		else // Demo
+		if( ApiClient.getSwitch().equals( "P" ) ) {
+			// Production
+			PUBLIC_KEY = "YodoKey/Prod/2048.public.der";
+		} else if( ApiClient.getSwitch().equals( "E" ) ) {
+			// Demo
 			PUBLIC_KEY = "YodoKey/Demo/2048.public.der";
-			//PUBLIC_KEY = "YodoKey/Dev/512.public.der";
+		} else if( ApiClient.getSwitch().equals( "D" ) ) {
+			// Development
+			PUBLIC_KEY = "YodoKey/Dev/2048.public.der";
+		} else {
+			// Local
+			PUBLIC_KEY = "YodoKey/Local/2048.public.der";
+		}
 	}
 
-	private final PublicKey mPubKey;
+	private final PublicKey publicKey;
 
 	/** Public key instance */
 	private static final String KEY_INSTANCE = "RSA";
@@ -54,11 +58,11 @@ public class RSACrypt {
 	 * @param context The Android context for the application
 	 */
 	public RSACrypt( Context context ) {
-		mPubKey = readPublicKey( context );
+		publicKey = readPublicKey( context );
 	}
 
 	public RSACrypt() {
-		mPubKey = null;
+		publicKey = null;
 	}
 
 	/**
@@ -99,7 +103,7 @@ public class RSACrypt {
 
 		try {
 			final Cipher cipher = Cipher.getInstance( CIPHER_INSTANCE );
-			cipher.init( Cipher.ENCRYPT_MODE, mPubKey );
+			cipher.init( Cipher.ENCRYPT_MODE, publicKey );
 			final byte[] cipherData = cipher.doFinal( plainText.getBytes( "UTF-8" ) );
 			encryptedData = CryptUtils.bytesToHex( cipherData );
 		} catch( Exception e ) {

@@ -12,16 +12,6 @@ public abstract class IRequest {
     /** DEBUG */
     private static final String TAG = IRequest.class.getSimpleName();
 
-    /** Formatted data for the request */
-    protected String mFormattedData;
-
-    /** Encrypted data for the request */
-    protected String mEncyptedData;
-    protected String mEncyptedKey;
-
-    /** The code for the response */
-    protected final int mResponseCode;
-
     /** Protocol version used in the requests */
     private static final String PROTOCOL_VERSION = "1.1.6";
 
@@ -29,12 +19,22 @@ public abstract class IRequest {
     protected static final String YODO         = "/yodo/";
     protected static final String YODO_ADDRESS = "/yodo/yodoswitchrequest/getRequest/";
 
+    /** Formatted data for the request */
+    protected String formattedData;
+
+    /** Encrypted data for the request */
+    protected String encryptedData;
+    protected String encryptedKey;
+
+    /** The code for the response */
+    protected final int responseCode;
+
     /** Data separator */
     protected static final String REQ_SEP = ",";
     protected static final String PCLIENT_SEP = "/";
 
     protected IRequest( int responseCode ) {
-        this.mResponseCode = responseCode;
+        this.responseCode = responseCode;
     }
 
     /**

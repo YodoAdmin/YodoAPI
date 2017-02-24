@@ -46,7 +46,7 @@ public class ExchangeRequest extends IRequest {
         super( responseCode );
         mPrimaryClient = hardwareToken;
         mSecondaryClient = client;
-        mFormattedData =
+        formattedData =
                 latitude   + REQ_SEP +
                 longitude  + REQ_SEP +
                 total      + REQ_SEP +
@@ -61,21 +61,21 @@ public class ExchangeRequest extends IRequest {
 
         SecretKeySpec key = AESCrypt.generateKey();
 
-        mEncyptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
-        mEncyptedData =
+        encryptedKey = oEncrypter.encrypt( AESCrypt.encodeKey( key ) );
+        encryptedData =
                 AESCrypt.encrypt( mPrimaryClient, key )   + REQ_SEP +
                 AESCrypt.encrypt( mSecondaryClient, key ) + REQ_SEP +
-                AESCrypt.encrypt( mFormattedData, key );
+                AESCrypt.encrypt( formattedData, key );
 
         // Encrypting to create request
-        /* mEncyptedData =
+        /* encryptedData =
                 oEncrypter.encrypt( mPrimaryClient ) + REQ_SEP +
                 mSecondaryClient                     + REQ_SEP +
-                oEncrypter.encrypt( mFormattedData ); */
+                oEncrypter.encrypt( formattedData ); */
 
         sEncryptedClientData =
-                mEncyptedKey + REQ_SEP +
-                mEncyptedData;
+                encryptedKey + REQ_SEP +
+                        encryptedData;
 
         pRequest = buildRequest( EXCH_RT,
                 EXCH_RETAIL_ST,
@@ -84,6 +84,6 @@ public class ExchangeRequest extends IRequest {
 
         IApiEndpoint iCaller = oManager.create( IApiEndpoint.class );
         Call<ServerResponse> sResponse = iCaller.exchange( pRequest );
-        oManager.sendRequest( sResponse, mResponseCode );
+        oManager.sendXMLRequest( sResponse, responseCode );
     }
 }
