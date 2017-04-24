@@ -5,31 +5,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
-import co.yodo.restapi.network.ApiClient;
+import co.yodo.restapi.YodoApi;
+import co.yodo.restapi.network.contract.RequestCallback;
 import co.yodo.restapi.network.model.ServerResponse;
-import co.yodo.restapi.network.request.AlternateRequest;
-import co.yodo.restapi.network.request.AuthenticateRequest;
-import co.yodo.restapi.network.request.CurrenciesRequest;
-import co.yodo.restapi.network.request.ExchangeRequest;
-import co.yodo.restapi.network.request.QueryRequest;
+import co.yodo.restapi.network.requests.CurrenciesRequest;
 import co.yodo.yodoapi.R;
+import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements ApiClient.RequestsListener {
-    /** DEBUG */
-    @SuppressWarnings( "unused" )
-    private static final String TAG = MainActivity.class.getSimpleName();
-
-    private ApiClient mRequestManager;
-
-    /** Response codes for the server requests */
-    private static final int AUTH_REQ = 0x00;
-    private static final int EXCH_REQ = 0x01;
-    private static final int QURY_REQ = 0x02;
-    private static final int CURR_REQ = 0x03;
-
+public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
@@ -46,7 +31,29 @@ public class MainActivity extends AppCompatActivity implements ApiClient.Request
             }
         } );
 
-        mRequestManager = ApiClient.getInstance( this );
+        YodoApi.execute(
+                new CurrenciesRequest("CAD", "USD"),
+                new RequestCallback() {
+                    @Override
+                    public void onPrepare() {
+
+                    }
+
+                    @Override
+                    public void onResponse(ServerResponse response) {
+                        Timber.i(response.toString());
+                    }
+
+                    @Override
+                    public void onError( Throwable error ) {
+
+                    }
+                }
+        );
+
+    }
+
+        /*mRequestManager = ApiClient.getInstance( this );
         mRequestManager.setListener( this );
         mRequestManager.invoke(
                 new AuthenticateRequest(
@@ -147,5 +154,5 @@ public class MainActivity extends AppCompatActivity implements ApiClient.Request
     @Override
     public void onError( Throwable error, String message ) {
 
-    }
+    }*/
 }
