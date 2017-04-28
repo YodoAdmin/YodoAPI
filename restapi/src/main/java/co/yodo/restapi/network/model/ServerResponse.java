@@ -1,12 +1,13 @@
 package co.yodo.restapi.network.model;
 
-import java.util.Collections;
-import java.util.HashMap;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 
 /**
  * Created by hei on 26/04/16.
  * Describes the data for the server responses
  */
+@Root( name = "Yodoresponse", strict = false )
 public class ServerResponse {
     /** ID for authorized responses */
     public static final String AUTHORIZED		       = "AU00";
@@ -16,10 +17,6 @@ public class ServerResponse {
     public static final String AUTHORIZED_TRANSFER     = "AU88";
 
     /** ID for error responses */
-    public static final String ERROR_UNKOWN        = "UNKN";
-    public static final String ERROR_NETWORK       = "NCON";
-    public static final String ERROR_TIMEOUT       = "TOUT";
-    public static final String ERROR_SERVER        = "ESRV";
     public static final String ERROR_FAILED        = "ER00";
     public static final String ERROR_MAX_LIM       = "ER13";
     public static final String ERROR_DUP_AUTH      = "ER20";
@@ -27,26 +24,20 @@ public class ServerResponse {
     public static final String ERROR_INCORRECT_PIP = "ER22";
     public static final String ERROR_INSUFF_FUNDS  = "ER25";
 
-    /** Param elements */
-    public static final String LOGO         = "logo_url";
-    public static final String DEBIT        = "MerchantDebitWTCost";
-    public static final String CREDIT       = "MerchantCreditWTCost";
-    public static final String CURRENCY     = "DefaultCurrency";
-    public static final String SETTLEMENT   = "Settlement";
-    public static final String EQUIPMENT    = "Equipments";
-    public static final String LEASE        = "Lease";
-    public static final String TOTAL_LEASE  = "TotalLease";
-    public static final String ACCOUNT      = "account";
-    public static final String PURCHASE     = "purchase_price";
-    public static final String AMOUNT_DELTA = "amount_delta";
-    public static final String MERCH_RATE   = "merch_rate";
-    public static final String TENDER_RATE  = "tender_rate";
-
+    @Element( name = "code" )
     private String code;
+
+    @Element( name = "authNumber" )
     private String authNumber;
+
+    @Element( name = "message", required = false )
     private String message;
+
+    @Element
+    private Params params;
+
+    @Element( name = "rtime" )
     private long rtime;
-    private HashMap<String, String> params = new HashMap<>();
 
     public void setCode( String code ) {
         this.code = code;
@@ -56,39 +47,25 @@ public class ServerResponse {
         return this.code;
     }
 
-    public void setAuthNumber( String authNumber ) {
-        this.authNumber = authNumber;
-    }
-
     public String getAuthNumber() {
         return this.authNumber;
-    }
-
-    public void setMessage( String message ) {
-        this.message = message;
     }
 
     public String getMessage() {
         return this.message;
     }
 
-    public void setRTime( long rtime ) {
-        this.rtime = rtime;
+    public Params getParams() {
+        return this.params;
     }
 
     public long getRTime() {
         return this.rtime;
     }
 
-    public void addParam( String key, String value ) {
-        params.put( key, value );
+    public void setParams( Params params ) {
+        this.params = params;
     }
-
-    public String getParam( String key ) {
-        return params.get( key );
-    }
-
-    public HashMap<String, String> getParams() { return params; }
 
     @Override
     public String toString() {
@@ -96,6 +73,7 @@ public class ServerResponse {
                 " AuthNumber : " + this.authNumber + "\n" +
                 " Message : "    + this.message    + "\n" +
                 " Time : "       + this.rtime      + "\n" +
-                " Params : "     + Collections.singletonList( this.params );
+                " Params : "     + this.params.toString();
     }
 }
+
