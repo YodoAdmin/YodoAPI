@@ -2,6 +2,7 @@ package co.yodo.restapi.network.requests;
 
 import co.yodo.restapi.network.contract.RequestCallback;
 import co.yodo.restapi.network.requests.contract.ExchRequest;
+import timber.log.Timber;
 
 /**
  * Created by hei on 21/04/17.
@@ -20,10 +21,12 @@ public final class ExchRetailRequest extends ExchRequest {
                 cashTender + REQ_SEP +
                 cashBack + REQ_SEP +
                 currency;
+        Timber.d(secondaryClient);
     }
 
     @Override
     public void execute(RequestCallback callback) {
+        Timber.d(formattedData);
         client.sendXmlRequest(buildBody(), callback);
     }
 }
