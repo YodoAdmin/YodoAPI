@@ -2,7 +2,6 @@ package co.yodo.restapi.business.injection.module;
 
 import android.content.Context;
 
-import co.yodo.restapi.ApiClient;
 import co.yodo.restapi.YodoApi;
 import co.yodo.restapi.business.cipher.RSA;
 import co.yodo.restapi.business.cipher.contract.ICipher;

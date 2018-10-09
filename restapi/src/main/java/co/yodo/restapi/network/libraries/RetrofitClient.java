@@ -3,7 +3,6 @@ package co.yodo.restapi.network.libraries;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -13,7 +12,6 @@ import co.yodo.restapi.network.contract.IExecuter;
 import co.yodo.restapi.network.contract.RequestCallback;
 import co.yodo.restapi.network.libraries.contract.IClient;
 import co.yodo.restapi.network.model.ServerResponse;
-import co.yodo.restapi.utils.JsonUtils;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;

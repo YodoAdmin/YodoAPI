@@ -78,4 +78,8 @@ public final class YodoApi {
     public static void execute(ICommand request, RequestCallback callback) {
         api.invoke(request, callback);
     }
+
+    public static void clear() {
+        PrefUtils.clearPreferences();
+    }
 }

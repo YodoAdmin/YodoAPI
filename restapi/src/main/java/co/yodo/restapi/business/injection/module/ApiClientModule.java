@@ -1,5 +1,7 @@
 package co.yodo.restapi.business.injection.module;
 
+import java.util.concurrent.TimeUnit;
+
 import co.yodo.restapi.business.injection.scope.ApplicationScope;
 import co.yodo.restapi.network.libraries.RetrofitClient;
 import co.yodo.restapi.network.libraries.contract.IClient;
@@ -42,6 +44,9 @@ public class ApiClientModule {
     OkHttpClient providesOkHttpClient(HttpLoggingInterceptor logging) {
         return new OkHttpClient.Builder()
                 .addInterceptor(logging)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
                 .build();
     }
 

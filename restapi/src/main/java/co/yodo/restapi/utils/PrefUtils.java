@@ -71,4 +71,8 @@ public class PrefUtils {
 
         return identifier;
     }
+
+    public static void clearPreferences() {
+        Hawk.deleteAll();
+    }
 }
