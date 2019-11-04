@@ -56,6 +56,15 @@ public class Params {
     @Element( name = "account_bal", required = false )
     private String accountBalance;
 
+    @Element( name = "account_cur", required = false )
+    private String accountCurrency;
+
+    @Element( name = "static_balance", required = false )
+    private String staticBalance;
+
+    @Element( name = "static_curr", required = false )
+    private String staticCurrency;
+
     @Element( name = "Fare0", required = false )
     private Fare elderlyZone1;
 
@@ -159,6 +168,18 @@ public class Params {
 
     public String getAccountBalance() {
         return accountBalance;
+    }
+
+    public String getAccountCurrency() {
+        return accountCurrency;
+    }
+
+    public String getStaticBalance() {
+        return staticBalance;
+    }
+
+    public String getStaticCurrency() {
+        return staticCurrency;
     }
 
     public Fare getElderlyZone1() {

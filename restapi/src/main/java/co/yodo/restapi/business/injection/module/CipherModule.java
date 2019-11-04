@@ -18,7 +18,7 @@ public class CipherModule {
         switch (baseUrl) {
             // Production
             case YodoApi.PROD_IP:
-                path = "YodoKey/Prod/2048.public.der";
+                path = "YodoKey/Prod/1024.public.der";
                 break;
 
             // Demo
@@ -27,9 +27,9 @@ public class CipherModule {
                 break;
 
             // Development
-            case YodoApi.DEV_IP:
+            /*case YodoApi.DEV_IP:
                 path = "YodoKey/Dev/2048.public.der";
-                break;
+                break;*/
 
             // Local
             default:

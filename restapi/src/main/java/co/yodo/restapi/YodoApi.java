@@ -14,9 +14,11 @@ import static co.yodo.restapi.utils.ErrorUtils.checkNull;
  */
 public final class YodoApi {
     /** Switch server IP address */
-    public static final String PROD_IP = "http://50.56.180.133";   // Production
-    public static final String DEMO_IP = "http://162.244.228.84";  // Demo
-    public static final String DEV_IP  = "http://162.244.228.78";  // Development
+    public static final String PROD_IP = "http://23.111.76.216";   // Production
+    public static final String DEMO_IP = "http://23.111.79.52";  // Demo
+    //public static final String PROD_IP = "http://50.56.180.133";   // Production
+    //public static final String DEMO_IP = "http://162.244.228.84";  // Demo
+    //public static final String DEV_IP  = "http://162.244.228.78";  // Development
 
     /**
      * We avoid the creation of an instance

@@ -1,11 +1,11 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "2.1"
     }
@@ -21,26 +21,26 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // -- Android --
-    implementation 'com.android.support:support-annotations:27.1.1'
+    implementation 'androidx.annotation:annotation:1.1.0'
 
     // -- Logging --
-    implementation 'com.jakewharton.timber:timber:4.7.0'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     // -- Secure preferences --
     implementation 'com.orhanobut:hawk:2.0.1'
 
     // -- Networking --
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation ('com.squareup.retrofit2:converter-simplexml:2.1.0') {
         exclude group: 'xpp3', module: 'xpp3'
         exclude group: 'stax', module: 'stax-api'
         exclude group: 'stax', module: 'stax'
     }
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
 
     // -- Dagger 2 --
     annotationProcessor 'com.google.dagger:dagger-compiler:2.17'
-    implementation 'com.google.dagger:dagger:2.17'
+    implementation 'com.google.dagger:dagger:2.19'
     compileOnly 'javax.annotation:jsr250-api:1.0'
 
     //////////////////////////////////// Testing ////////////////////////////////////

@@ -25,7 +25,7 @@ public class PrefUtils {
      * from the Phone (IMEI) or the Bluetooth (MAC)
      * @param context The Context of the Android system.
      */
-    @SuppressLint("HardwareIds")
+    @SuppressLint("HardwareIds, MissingPermission")
     private static String generateIdentifier(Context context) {
         String hardwareToken = null;
 

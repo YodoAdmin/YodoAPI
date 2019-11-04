@@ -44,9 +44,9 @@ public class ApiClientModule {
     OkHttpClient providesOkHttpClient(HttpLoggingInterceptor logging) {
         return new OkHttpClient.Builder()
                 .addInterceptor(logging)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(1, TimeUnit.MINUTES)
+                .writeTimeout(30, TimeUnit.SECONDS)
                 .build();
     }
 
